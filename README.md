@@ -650,4 +650,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-**Built with ❤️ for the security community**
+<div align="center">
+  <p><strong>Built with ❤️ for the security community</strong> by <a href="https://vril.li" title="Visit the VRIL LABS Website"><strong>VRIL LABS</strong></a></p>
+  <sub>Ancient Knowledge · Future Technology</sub>
+</div>
