@@ -95,14 +95,26 @@ This server enables AI agents and applications to perform security scans on vari
 
 ## Installation
 
-### 1. Clone the Repository
+### Option A: Run via npx (Recommended)
+
+`aliensec-mcp-server` is published to the npm registry, so you can run it directly with `npx` — no clone or build required:
+
+```bash
+npx -y aliensec-mcp-server
+```
+
+The server communicates over **stdio**, so you'll normally register it with an MCP client (see [Using with MCP Clients](#using-with-mcp-clients)) rather than running it standalone. Set `ALIENVAULT_API_KEY` (and optionally `VIRUSTOTAL_API_KEYS`) in the client configuration, as shown in each client's snippet below.
+
+### Option B: From Source (Contributors)
+
+#### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/VRIL-LABS/aliensec-mcp-server.git
 cd aliensec-mcp-server
 ```
 
-### 2. Install Dependencies
+#### 2. Install Dependencies
 
 ```bash
 npm install
@@ -110,7 +122,7 @@ npm install
 
 This will install all production and development dependencies.
 
-### 3. Configure Environment Variables
+#### 3. Configure Environment Variables
 
 Copy the example environment file and update with your API keys:
 
@@ -147,7 +159,7 @@ DATABASE_TIMEOUT=5000
 
 > **Note**: VirusTotal ToS prohibits using multiple API keys to bypass rate limits. This implementation respects those limits and uses multiple keys for redundancy only.
 
-### 4. (Optional) Install SQLite Encryption Dependencies
+#### 4. (Optional) Install SQLite Encryption Dependencies
 
 For encrypted database support on Linux/macOS:
 
@@ -182,7 +194,110 @@ npm start
 
 ### Using with MCP Clients
 
-The server communicates via **stdio** (standard input/output). To use it with an MCP client:
+The server communicates via **stdio** (standard input/output). Because it's published to npm, you can register it with any MCP client using `npx -y aliensec-mcp-server` — no local clone or build required.
+
+Below are copy-pasteable registration snippets for the major MCP clients. Replace `your_key_here` / `key1,key2` with your actual API keys. `ALIENVAULT_API_KEY` is required; `VIRUSTOTAL_API_KEYS` is optional.
+
+#### Claude Code (CLI)
+
+```bash
+claude mcp add aliensec -- npx -y aliensec-mcp-server
+```
+
+#### Claude Desktop
+
+Add to your `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "aliensec": {
+      "command": "npx",
+      "args": ["-y", "aliensec-mcp-server"],
+      "env": {
+        "ALIENVAULT_API_KEY": "your_key_here",
+        "VIRUSTOTAL_API_KEYS": "key1,key2"
+      }
+    }
+  }
+}
+```
+
+#### VS Code
+
+Add to `.vscode/mcp.json` (workspace) or your user `mcp.json`:
+
+```json
+{
+  "servers": {
+    "aliensec": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "aliensec-mcp-server"],
+      "env": {
+        "ALIENVAULT_API_KEY": "${input:alienvault_api_key}",
+        "VIRUSTOTAL_API_KEYS": "${input:virustotal_api_keys}"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "id": "alienvault_api_key",
+      "type": "promptString",
+      "description": "AlienVault OTX API key",
+      "password": true
+    },
+    {
+      "id": "virustotal_api_keys",
+      "type": "promptString",
+      "description": "VirusTotal API keys (comma-separated, optional)",
+      "password": true
+    }
+  ]
+}
+```
+
+#### Cursor
+
+Add to `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (project):
+
+```json
+{
+  "mcpServers": {
+    "aliensec": {
+      "command": "npx",
+      "args": ["-y", "aliensec-mcp-server"],
+      "env": {
+        "ALIENVAULT_API_KEY": "your_key_here",
+        "VIRUSTOTAL_API_KEYS": "key1,key2"
+      }
+    }
+  }
+}
+```
+
+#### Windsurf
+
+Add to `~/.codeium/windsurf/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "aliensec": {
+      "command": "npx",
+      "args": ["-y", "aliensec-mcp-server"],
+      "env": {
+        "ALIENVAULT_API_KEY": "your_key_here",
+        "VIRUSTOTAL_API_KEYS": "key1,key2"
+      }
+    }
+  }
+}
+```
+
+#### From Source (Contributors)
+
+If you've cloned and built the repository locally, point your client at the built entry point instead of using `npx`:
 
 ```bash
 # Direct execution
@@ -200,8 +315,8 @@ import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 
 const client = new Client({ name: 'my-client', version: '1.0.0' });
 const transport = new StdioClientTransport({
-  command: 'node',
-  args: ['dist/index.js'],
+  command: 'npx',
+  args: ['-y', 'aliensec-mcp-server'],
 });
 
 await client.connect(transport);
