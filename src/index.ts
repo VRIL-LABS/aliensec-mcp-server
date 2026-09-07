@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /**
  * AlienSec MCP Server - Main Entry Point
  *

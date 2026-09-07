@@ -61,7 +61,7 @@ describe('npm publish workflow', () => {
 
   it('publishes with provenance, public access, and a dist-tag', () => {
     expect(workflow).toContain(
-      'npm publish --provenance --access public --tag ${{ github.event.inputs.tag || \'latest\' }}'
+      "npm publish --provenance --access public --tag ${{ github.event.inputs.tag || 'latest' }}"
     );
   });
 
@@ -92,5 +92,12 @@ describe('package.json publish configuration', () => {
 
   it('builds before packing via the prepack script', () => {
     expect(pkg.scripts.prepack).toBe('npm run build');
+  });
+});
+
+describe('CLI entry point', () => {
+  it('src/index.ts starts with a node shebang so the bin runs via npx', () => {
+    const source = fs.readFileSync(path.resolve(__dirname, './index.ts'), 'utf8');
+    expect(source.startsWith('#!/usr/bin/env node')).toBe(true);
   });
 });
