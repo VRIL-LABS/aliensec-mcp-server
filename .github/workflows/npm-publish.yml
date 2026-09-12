@@ -47,9 +47,8 @@ jobs:
 
       - name: Check version not already published
         run: |
-          PUBLISHED=$(npm view aliensec-mcp-server version 2>/dev/null || echo "0.0.0")
           LOCAL=$(node -p "require('./package.json').version")
-          if [ "$PUBLISHED" = "$LOCAL" ]; then
+          if npm view "aliensec-mcp-server@$LOCAL" version >/dev/null 2>&1; then
             echo "::error::Version $LOCAL is already published to npm"
             exit 1
           fi
@@ -58,6 +57,7 @@ jobs:
         run: npm pack --dry-run
 
       - name: Publish to npm
-        run: npm publish --provenance --access public --tag ${{ github.event.inputs.tag || 'latest' }}
+        run: npm publish --provenance --access public --tag "$NPM_TAG"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
+          NPM_TAG: ${{ github.event.inputs.tag || 'latest' }}

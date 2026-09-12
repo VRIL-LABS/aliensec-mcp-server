@@ -9,6 +9,9 @@
 import { describe, it, expect } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const WORKFLOW_PATH = path.resolve(__dirname, '../.github/workflows/npm-publish.yml');
 const PACKAGE_PATH = path.resolve(__dirname, '../package.json');
@@ -55,14 +58,13 @@ describe('npm publish workflow', () => {
   });
 
   it('guards against re-publishing an existing version', () => {
-    expect(workflow).toContain('npm view aliensec-mcp-server version');
+    expect(workflow).toContain('npm view "aliensec-mcp-server@$LOCAL" version');
     expect(workflow).toContain('already published to npm');
   });
 
   it('publishes with provenance, public access, and a dist-tag', () => {
-    expect(workflow).toContain(
-      "npm publish --provenance --access public --tag ${{ github.event.inputs.tag || 'latest' }}"
-    );
+    expect(workflow).toContain('npm publish --provenance --access public --tag "$NPM_TAG"');
+    expect(workflow).toContain("NPM_TAG: ${{ github.event.inputs.tag || 'latest' }}");
   });
 
   it('authenticates via the NPM_REGISTRY_TOKEN secret', () => {

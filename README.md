@@ -201,7 +201,7 @@ Below are copy-pasteable registration snippets for the major MCP clients. Replac
 #### Claude Code (CLI)
 
 ```bash
-claude mcp add aliensec -- npx -y aliensec-mcp-server
+claude mcp add aliensec --env ALIENVAULT_API_KEY=your_key_here --env VIRUSTOTAL_API_KEYS=key1,key2 -- npx -y aliensec-mcp-server
 ```
 
 #### Claude Desktop
