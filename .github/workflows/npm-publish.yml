@@ -1,9 +1,14 @@
 name: NPM Publish
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'npm dist-tag to publish under'
+        required: false
+        default: 'latest'
 
 permissions: read-all
 
@@ -11,6 +16,9 @@ jobs:
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # required for npm provenance attestation
     steps:
       - name: Checkout repository
         uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a
@@ -18,17 +26,38 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@94196ee1d15439c1b6651cd87ef14e88ec435966
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: npm ci
 
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run type checking
+        run: npm run typecheck
+
+      - name: Run tests
+        run: npm test
+
       - name: Build project
         run: npm run build
 
+      - name: Check version not already published
+        run: |
+          LOCAL=$(node -p "require('./package.json').version")
+          if npm view "aliensec-mcp-server@$LOCAL" version >/dev/null 2>&1; then
+            echo "::error::Version $LOCAL is already published to npm"
+            exit 1
+          fi
+
+      - name: Verify package contents
+        run: npm pack --dry-run
+
       - name: Publish to npm
-        run: npm publish --access public
+        run: npm publish --provenance --access public --tag "$NPM_TAG"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
+          NPM_TAG: ${{ github.event.inputs.tag || 'latest' }}

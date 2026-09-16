@@ -62,6 +62,22 @@ This document tracks the improvements made to address OpenSSF Scorecard checks f
   - Gitleaks for secret scanning
   - CodeQL for SAST
 
+### 9. ✅ Hardened npm Publishing with Provenance
+- **Issue**: The npm publish workflow was minimal (tag-push only, no provenance, no CI gate) and the package was not installable via `npx`
+- **Fix**: Upgraded `.github/workflows/npm-publish.yml` to the npm supply-chain security best practice:
+  - Triggers on GitHub **Release** `published` (plus manual `workflow_dispatch` with a dist-tag)
+  - `id-token: write` permission + `npm publish --provenance` generates a signed [npm provenance attestation](https://docs.npmjs.com/generating-provenance-statements)
+  - Full CI gate (`lint`, `typecheck`, `test`, `build`) runs before publish so a broken build never reaches the registry
+  - `npm pack --dry-run` verifies the tarball contents; a version check fails if the version is already published
+  - Uses Node.js 22 to match `engines`
+  - Added a `#!/usr/bin/env node` shebang so the `bin` entry runs via `npx`
+  - Restricted `package.json` `files` to `dist` only and added `publishConfig.access: public` so the published tarball excludes tests and dev config
+- **Files Modified**:
+  - `.github/workflows/npm-publish.yml`
+  - `package.json`
+  - `src/index.ts`
+  - `README.md`
+
 ## Pending Items (Require Manual Intervention)
 
 ### 1. ⏳ Signed-Releases
