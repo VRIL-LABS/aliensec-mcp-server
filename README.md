@@ -15,7 +15,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6.3-blue.svg)](https://www.typescriptlang.org/)
 [![MCP](https://img.shields.io/badge/Model_Context_Protocol-2.0.0-orange.svg)](https://modelcontextprotocol.io/)
 [![M8ven Verified](https://m8ven.ai/badge/mcp/vrillabs-aliensec-mcp-server-1f8v92?variant=verified)](https://m8ven.ai/mcp/vrillabs-aliensec-mcp-server-1f8v92)
-[![M8ven Score](https://m8ven.ai/badge/mcp/vrillabs-anonsec-mcp-server-1ip8nb)](https://m8ven.ai/mcp/vrillabs-anonsec-mcp-server-1ip8nb)
+[![M8ven Score](https://m8ven.ai/badge/mcp/vrillabs-aliensec-mcp-server-1ip8nb)](https://m8ven.ai/mcp/vrillabs-aliensec-mcp-server-1ip8nb)
 
 
 <sub>// crafted for the security community — funding keeps it maintained</sub>
